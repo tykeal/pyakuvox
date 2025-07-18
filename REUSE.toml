@@ -1,0 +1,16 @@
+version = 1
+
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 Andrew Grimberg <tykeal@bardicgrove.org>
+
+# Licensing statement required for GHA tests and linting to pass for only this repository
+
+[[annotations]]
+path = [
+	"tests/dist/**",
+	"*.lock",
+    "test_coverage_report*",
+    ".mypy_cache/**",
+]
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileCopyrightText = "2025 Andrew Grimberg <tykeal@bardicgrove.org>"

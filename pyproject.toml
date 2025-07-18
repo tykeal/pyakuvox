@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2023 Andrew Grimberg <tykeal@bardicgrove.org>
+
+[project]
+name = "pyakuvox"
+dynamic = ["version"]
+description = "Python library for use with Akuvox intercoms"
+readme = "README.md"
+authors = [
+    { name = "Andrew Grimberg", email = "tykeal@bardicgrove.org" }
+]
+requires-python = ">=3.13"
+dependencies = []
+license = {text = "Apache-2.0"}
+
+[project.optional-dependencies]
+testing = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+style = "pep440"
+bump = true
+fallback-version = "0.0.0"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.17.0",
+]
