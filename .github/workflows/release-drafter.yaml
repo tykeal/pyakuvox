@@ -27,7 +27,7 @@ permissions: {}
 
 concurrency:
   # yamllint disable-line rule:line-length
-  group: "rd-${{ github.event_name }}-${{ github.event.number }}-${{ github.ref }}"
+  group: "rd-${{ github.event_name }}-${{ github.event.number || 'none' }}-${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
@@ -41,11 +41,11 @@ jobs:
         # yamllint disable rule:line-length
         run: |
           # Concurrency Group
-          echo "Concurrency group: rd-${{ github.event_name }}-${{ github.event.number }}-${{ github.ref }}"
+          echo "Concurrency group: rd-${{ github.event_name }}-${{ github.event.number || 'none' }}-${{ github.ref }}"
           # shellcheck disable=SC2129
           echo "## Release Drafter" \
             >> "$GITHUB_STEP_SUMMARY"
-          echo "Concurrency group: rd-${{ github.event_name }}-${{ github.event.number }}-${{ github.ref }}" \
+          echo "Concurrency group: rd-${{ github.event_name }}-${{ github.event.number || 'none' }}-${{ github.ref }}" \
             >> "$GITHUB_STEP_SUMMARY"
 
   # yamllint enable rule:line-length
