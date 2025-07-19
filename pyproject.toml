@@ -10,7 +10,10 @@ authors = [
     { name = "Andrew Grimberg", email = "tykeal@bardicgrove.org" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "requests>=2.32.4",
+    "requests-oauthlib>=2.0.0",
+]
 license = {text = "Apache-2.0"}
 
 [project.optional-dependencies]
