@@ -8,6 +8,7 @@ from typing import Final
 import requests
 
 from .const import BASE_DOMAIN
+from .const import DEFAULT_TIMEOUT
 from .const import SUBDOMAINS_LIST
 from .exceptions import NotAuthenticatedError
 
@@ -49,32 +50,76 @@ class AkuvoxAuth:
             "passwd": self.password,
         }
 
-        response = requests.post(url, json=payload)
+        response = requests.post(
+            url, json=payload, timeout=DEFAULT_TIMEOUT, verify=True
+        )
         response.raise_for_status()
         data = response.json()
-        if "response" in data and data["response"] == "0":
-            pass
-        else:
+        if not ("response" in data and data["response"] == "0"):
             raise NotAuthenticatedError(
                 f"Authentication failed: {data.get('message', 'Unknown error')}"
             )
 
-        if "token" in data:
-            self._token = data["token"]
-        else:
-            raise NotAuthenticatedError("Authentication failed: No token received.")
+        key_to_attr = {
+            "token": "_token",
+            "grade": "_grade",
+            "account": "_account",
+            "timezone": "_timezone",
+            "community_id": "_community_id",
+            "role": "_role",
+        }
 
-        if "grade" in data:
-            self._grade = data["grade"]
+        for key, attr in key_to_attr.items():
+            if key in data:
+                setattr(self, attr, data[key])
 
-        if "account" in data:
-            self._account = data["account"]
+    @property
+    def token(self) -> str:
+        """Get the authentication token.
 
-        if "timezone" in data:
-            self._timezone = data["timezone"]
+        :raises NotAuthenticatedError: If the user is not authenticated.
+        """
+        if self._token is None:
+            raise NotAuthenticatedError("User is not authenticated.")
+        return self._token
 
-        if "community_id" in data:
-            self._community_id = data["community_id"]
+    @property
+    def grade(self) -> str | None:
+        """Get the user's grade."""
+        return self._grade
 
-        if "role" in data:
-            self._role = data["role"]
+    @property
+    def account(self) -> str | None:
+        """Get the user's account."""
+        return self._account
+
+    @property
+    def timezone(self) -> str | None:
+        """Get the user's timezone."""
+        return self._timezone
+
+    @property
+    def community_id(self) -> str | None:
+        """Get the user's community ID."""
+        return self._community_id
+
+    @property
+    def role(self) -> str | None:
+        """Get the user's role."""
+        return self._role
+
+    def is_authenticated(self) -> bool:
+        """Check if the user is authenticated.
+
+        :return: True if authenticated, False otherwise.
+        :rtype: bool
+        """
+        return self._token is not None
+
+    def __repr__(self) -> str:
+        """Return a string representation of the AkuvoxAuth object."""
+        return f"AkuvoxAuth(subdomain={self.base_url}, username=[REDACTED])"
+
+    def __str__(self) -> str:
+        """Return a user-friendly string representation of the AkuvoxAuth object."""
+        return self.__repr__()

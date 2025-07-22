@@ -7,6 +7,8 @@ from typing import Final
 
 BASE_DOMAIN: Final[str] = "akuvox.com"
 
+DEFAULT_TIMEOUT: Final[int] = 60
+
 SUBDOMAIN_AMERICA: Final[str] = "ucloud"
 SUBDOMAIN_ASIA: Final[str] = "scloud"
 SUBDOMAIN_CHINA: Final[str] = "ccloud"

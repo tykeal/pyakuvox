@@ -2,7 +2,6 @@
 # SPDX-FileCopyrightText: 2023 Andrew Grimberg <tykeal@bardicgrove.org>
 """pyakuvox: A Python library for interacting with the Akuvox VoIP system."""
 
+from .auth import AkuvoxAuth
 
-def hello() -> str:
-    """Your basic hello world function."""
-    return "Hello from pyakuvox!"
+__all__ = ["AkuvoxAuth"]

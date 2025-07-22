@@ -6,6 +6,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from pyakuvox.auth import AkuvoxAuth
 from pyakuvox.const import SUBDOMAINS_LIST, BASE_DOMAIN
+from pyakuvox.exceptions import NotAuthenticatedError
 
 
 def test_init_valid_subdomain():
@@ -17,7 +18,10 @@ def test_init_valid_subdomain():
     assert auth.base_url == f"https://api.{subdomain}.{BASE_DOMAIN}"
     assert auth.username == username
     assert auth.password == password
-    assert auth._token is None
+    with pytest.raises(NotAuthenticatedError) as excinfo:
+        auth.token
+    assert "User is not authenticated" in str(excinfo.value)
+    assert auth.is_authenticated() is False
 
 
 def test_init_invalid_subdomain():
@@ -40,11 +44,25 @@ def test_authenticate_success(mock_post):
 
     mock_response = MagicMock()
     mock_response.status_code = 200
-    mock_response.json.return_value = {"response": "0", "token": "fake-token"}
+    mock_response.json.return_value = {
+        "response": "0",
+        "token": "fake-token",
+        "grade": "user",
+        "account": "user_account",
+        "timezone": "UTC",
+        "community_id": "community_123",
+        "role": "user_role",
+    }
     mock_post.return_value = mock_response
 
     auth.authenticate()
-    assert auth._token == "fake-token"
+    assert auth.token == "fake-token"
+    assert auth.grade == "user"
+    assert auth.account == "user_account"
+    assert auth.timezone == "UTC"
+    assert auth.community_id == "community_123"
+    assert auth.role == "user_role"
+    assert auth.is_authenticated() is True
     mock_post.assert_called_once()
 
 
@@ -63,10 +81,13 @@ def test_authenticate_failure(mock_post):
     mock_response.json.return_value = {"error": "Unauthorized"}
     mock_post.return_value = mock_response
 
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(NotAuthenticatedError) as excinfo:
         auth.authenticate()
     assert "Authentication failed" in str(excinfo.value)
-    assert auth._token is None
+    with pytest.raises(NotAuthenticatedError) as excinfo:
+        auth.token
+    assert "User is not authenticated" in str(excinfo.value)
+    assert auth.is_authenticated() is False
 
 
 def test_repr_and_str():
