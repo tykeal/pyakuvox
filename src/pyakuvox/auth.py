@@ -55,7 +55,7 @@ class AkuvoxAuth:
         )
         response.raise_for_status()
         data = response.json()
-        if not ("response" in data and data["response"] == "0"):
+        if not ("result" in data and data["result"] == "0"):
             raise NotAuthenticatedError(
                 f"Authentication failed: {data.get('message', 'Unknown error')}"
             )
