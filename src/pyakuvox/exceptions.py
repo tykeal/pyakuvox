@@ -13,3 +13,11 @@ class NotAuthenticatedError(AkuvoxError):
     def __init__(self, message: str = "User is not authenticated."):
         """Raise an error when a user is not authenticated."""
         super().__init__(message)
+
+
+class UnknownError(AkuvoxError):
+    """Exception raised for unknown errors."""
+
+    def __init__(self, message: str = "An unknown error occurred."):
+        """Raise an error when an unknown error occurs."""
+        super().__init__(message)

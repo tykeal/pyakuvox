@@ -9,8 +9,55 @@ import requests
 
 from .const import BASE_DOMAIN
 from .const import DEFAULT_TIMEOUT
+from .const import RESULT_SUCCESS, RESULT_UNKNOWN, RESULTS
 from .const import SUBDOMAINS_LIST
-from .exceptions import NotAuthenticatedError
+from .exceptions import NotAuthenticatedError, UnknownError
+
+
+def _raise_for_result(result: int, message: str | None = None) -> None:
+    """Raise an exception based on the result code.
+
+    :param result: The result code from the API response.
+    :type result: int
+    :param message: Optional message to include in the exception.
+    :type message: str | None
+    :raises UnknownError: If the result code indicates an error.
+
+    :meta private:
+    """
+    if result in RESULTS:
+        if result != RESULT_SUCCESS:
+            error_message = message or RESULTS[result]
+            raise UnknownError(
+                f"API request failed with result {result}: {error_message}"
+            )
+
+
+def _requests(method: str, url: str, **kwargs) -> dict:
+    """Make a request to the Akuvox API.
+
+    :param method: HTTP method to use (e.g., 'GET', 'POST').
+    :type method: str
+    :param url: The URL to send the request to.
+    :type url: str
+    :param kwargs: Additional keyword arguments for the request.
+    :return: The response from the Akuvox API.
+    :rtype: requests.Response
+
+    :meta private:
+    """
+    try:
+        response = requests.request(method, url, **kwargs)
+        response.raise_for_status()
+
+        json_response = response.json()
+        _raise_for_result(
+            json_response.get("result", RESULT_UNKNOWN), json_response.get("message")
+        )
+
+        return json_response
+    except requests.RequestException as e:
+        raise UnknownError(f"Request failed: {e}")
 
 
 class Auth:
