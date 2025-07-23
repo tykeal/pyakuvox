@@ -4,7 +4,7 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from pyakuvox.auth import AkuvoxAuth
+from pyakuvox.auth import Auth
 from pyakuvox.const import SUBDOMAINS_LIST, BASE_DOMAIN
 from pyakuvox.exceptions import NotAuthenticatedError
 
@@ -14,7 +14,7 @@ def test_init_valid_subdomain():
     subdomain = SUBDOMAINS_LIST[0]
     username = "user"
     password = "pass"
-    auth = AkuvoxAuth(subdomain, username, password)
+    auth = Auth(subdomain, username, password)
     assert auth.base_url == f"https://api.{subdomain}.{BASE_DOMAIN}"
     assert auth.username == username
     assert auth.password == password
@@ -30,7 +30,7 @@ def test_init_invalid_subdomain():
     username = "user"
     password = "pass"
     with pytest.raises(ValueError) as excinfo:
-        AkuvoxAuth(invalid_subdomain, username, password)
+        Auth(invalid_subdomain, username, password)
     assert "Invalid subdomain" in str(excinfo.value)
 
 
@@ -40,7 +40,7 @@ def test_authenticate_success(mock_post):
     subdomain = SUBDOMAINS_LIST[0]
     username = "user"
     password = "pass"
-    auth = AkuvoxAuth(subdomain, username, password)
+    auth = Auth(subdomain, username, password)
 
     mock_response = MagicMock()
     mock_response.status_code = 200
@@ -72,7 +72,7 @@ def test_authenticate_failure(mock_post):
     subdomain = SUBDOMAINS_LIST[0]
     username = "user"
     password = "pass"
-    auth = AkuvoxAuth(subdomain, username, password)
+    auth = Auth(subdomain, username, password)
 
     mock_response = MagicMock()
     # Akuvox API returns 200 response for all authentication
@@ -95,6 +95,6 @@ def test_repr_and_str():
     subdomain = SUBDOMAINS_LIST[0]
     username = "user"
     password = "pass"
-    auth = AkuvoxAuth(subdomain, username, password)
-    assert "AkuvoxAuth" in repr(auth)
-    assert "AkuvoxAuth" in str(auth)
+    auth = Auth(subdomain, username, password)
+    assert "Auth" in repr(auth)
+    assert "Auth" in str(auth)

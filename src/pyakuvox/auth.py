@@ -13,11 +13,11 @@ from .const import SUBDOMAINS_LIST
 from .exceptions import NotAuthenticatedError
 
 
-class AkuvoxAuth:
+class Auth:
     """Class to handle authentication and session management for Akuvox."""
 
     def __init__(self, subdomain: str, username: str, password: str) -> None:
-        """Initialize the AkuvoxAuth with a specific subdomain.
+        """Initialize the Auth with a specific subdomain.
 
         :param subdomain: The subdomain to use for the Akuvox API.
         :type subdomain: str
@@ -117,9 +117,9 @@ class AkuvoxAuth:
         return self._token is not None
 
     def __repr__(self) -> str:
-        """Return a string representation of the AkuvoxAuth object."""
-        return f"AkuvoxAuth(subdomain={self.base_url}, username=[REDACTED])"
+        """Return a string representation of the Auth object."""
+        return f"Auth(subdomain={self.base_url}, username=[REDACTED])"
 
     def __str__(self) -> str:
-        """Return a user-friendly string representation of the AkuvoxAuth object."""
+        """Return a user-friendly string representation of the Auth object."""
         return self.__repr__()
