@@ -55,7 +55,7 @@ class AkuvoxAuth:
         )
         response.raise_for_status()
         data = response.json()
-        if not ("result" in data and data["result"] == "0"):
+        if not ("result" in data and data["result"] == 0):
             raise NotAuthenticatedError(
                 f"Authentication failed: {data.get('message', 'Unknown error')}"
             )
@@ -64,9 +64,9 @@ class AkuvoxAuth:
             "token": "_token",
             "grade": "_grade",
             "account": "_account",
-            "timezone": "_timezone",
-            "community_id": "_community_id",
-            "role": "_role",
+            "timeZone": "_timezone",
+            "communityID": "_community_id",
+            "Role": "_role",
         }
 
         for key, attr in key_to_attr.items():
