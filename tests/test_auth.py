@@ -45,13 +45,13 @@ def test_authenticate_success(mock_post):
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "result": "0",
+        "result": 0,
         "token": "fake-token",
         "grade": "user",
         "account": "user_account",
-        "timezone": "UTC",
-        "community_id": "community_123",
-        "role": "user_role",
+        "timeZone": "UTC",
+        "communityID": "community_123",
+        "Role": "user_role",
     }
     mock_post.return_value = mock_response
 
