@@ -5,12 +5,12 @@
 from pyakuvox.api import Akuvox
 
 
-class MockAkuvoxAuth:
-    """Mock class for AkuvoxAuth to simulate authentication."""
+class MockAuth:
+    """Mock class for Auth to simulate authentication."""
 
 
 def test_akuvox_init_sets_auth():
     """Test that the Akuvox API initializes with the provided authentication."""
-    mock_auth = MockAkuvoxAuth()
+    mock_auth = MockAuth()
     akuvox = Akuvox(auth=mock_auth)
     assert akuvox.auth is mock_auth

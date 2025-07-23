@@ -4,16 +4,16 @@
 
 from __future__ import annotations
 
-from .auth import AkuvoxAuth
+from .auth import Auth
 
 
 class Akuvox:
     """API for interacting with Akuvox services."""
 
-    def __init__(self, auth: AkuvoxAuth) -> None:
+    def __init__(self, auth: Auth) -> None:
         """Initialize the Akuvox API with authentication.
 
-        :param auth: An instance of AkuvoxAuth for authentication.
-        :type auth: AkuvoxAuth
+        :param auth: An instance of Auth for authentication.
+        :type auth: Auth
         """
         self.auth = auth
