@@ -9,8 +9,63 @@ import requests
 
 from .const import BASE_DOMAIN
 from .const import DEFAULT_TIMEOUT
+from .const import RESULTS
+from .const import RESULT_INVALID_USERNAME_OR_PASSWORD
+from .const import RESULT_SUCCESS
+from .const import RESULT_UNKNOWN
 from .const import SUBDOMAINS_LIST
-from .exceptions import NotAuthenticatedError
+from .exceptions import NotAuthenticatedError, UnknownError
+
+
+def _raise_for_result(result: int, message: str | None = None) -> None:
+    """Raise an exception based on the result code.
+
+    :param result: The result code from the API response.
+    :type result: int
+    :param message: Optional message to include in the exception.
+    :type message: str | None
+    :raises UnknownError: If the result code indicates an error.
+
+    :meta private:
+    """
+    if result in RESULTS:
+        if result != RESULT_SUCCESS:
+            error_message = message or RESULTS[result]
+            if result == RESULT_INVALID_USERNAME_OR_PASSWORD:
+                raise NotAuthenticatedError(error_message)
+            else:
+                raise UnknownError(
+                    f"API request failed with result {result}: {error_message}"
+                )
+
+
+def _requests(method: str, url: str, **kwargs) -> dict:
+    """Make a request to the Akuvox API.
+
+    :param method: HTTP method to use (e.g., 'GET', 'POST').
+    :type method: str
+    :param url: The URL to send the request to.
+    :type url: str
+    :param kwargs: Additional keyword arguments for the request.
+    :return: The parsed JSON response from the Akuvox API.
+    :rtype: dict
+
+    :meta private:
+    """
+    try:
+        kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+        kwargs.setdefault("verify", True)  # Ensure SSL verification is enabled
+        response = requests.request(method, url, **kwargs)
+        response.raise_for_status()
+
+        json_response = response.json()
+        _raise_for_result(
+            json_response.get("result", RESULT_UNKNOWN), json_response.get("message")
+        )
+
+        return json_response
+    except requests.RequestException as e:
+        raise UnknownError(f"Request failed: {e}")
 
 
 class Auth:
@@ -50,15 +105,7 @@ class Auth:
             "passwd": self.password,
         }
 
-        response = requests.post(
-            url, json=payload, timeout=DEFAULT_TIMEOUT, verify=True
-        )
-        response.raise_for_status()
-        data = response.json()
-        if not ("result" in data and data["result"] == 0):
-            raise NotAuthenticatedError(
-                f"Authentication failed: {data.get('message', 'Unknown error')}"
-            )
+        data = _requests("POST", url, json=payload)
 
         key_to_attr = {
             "token": "_token",
@@ -108,6 +155,7 @@ class Auth:
         """Get the user's role."""
         return self._role
 
+    @property
     def is_authenticated(self) -> bool:
         """Check if the user is authenticated.
 
@@ -123,3 +171,24 @@ class Auth:
     def __str__(self) -> str:
         """Return a user-friendly string representation of the Auth object."""
         return self.__repr__()
+
+    def requests(self, method: str, path: str, **kwargs) -> dict:
+        """Make a request to the Akuvox API using the authenticated session.
+
+        :param method: HTTP method to use (e.g., 'GET', 'POST').
+        :type method: str
+        :param path: The API endpoint to send the request to.
+        :type path: str
+        :param kwargs: Additional keyword arguments for the request.
+        :return: The response from the Akuvox API.
+        :rtype: dict
+        """
+        if not self.is_authenticated:
+            self.authenticate()
+
+        url = f"{self.base_url}/{path.lstrip('/')}"
+        if "headers" not in kwargs:
+            kwargs["headers"] = {}
+        kwargs["headers"]["x-auth-token"] = self.token
+
+        return _requests(method, url, **kwargs)

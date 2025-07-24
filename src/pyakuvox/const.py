@@ -22,3 +22,16 @@ SUBDOMAINS_LIST: Final[list[str]] = [
     SUBDOMAIN_EU,
     SUBDOMAIN_TEST,
 ]
+
+# Result codes
+RESULT_UNKNOWN: Final[int] = -1
+RESULT_SUCCESS: Final[int] = 0
+RESULT_INVALID_USERNAME_OR_PASSWORD: Final[int] = 3
+RESULT_INVALID_IDENTITY: Final[int] = 1006
+
+RESULTS: Final[dict[int, str]] = {
+    RESULT_UNKNOWN: "Unknown error",
+    RESULT_SUCCESS: "Success",
+    RESULT_INVALID_USERNAME_OR_PASSWORD: "Invalid username or password",
+    RESULT_INVALID_IDENTITY: "Invalid identity",
+}
