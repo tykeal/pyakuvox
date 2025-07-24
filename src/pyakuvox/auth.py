@@ -8,8 +8,10 @@ from typing import Final
 import requests
 
 from .const import BASE_DOMAIN
-from .const import DEFAULT_TIMEOUT
-from .const import RESULT_SUCCESS, RESULT_UNKNOWN, RESULTS
+from .const import RESULTS
+from .const import RESULT_INVALID_USERNAME_OR_PASSWORD
+from .const import RESULT_SUCCESS
+from .const import RESULT_UNKNOWN
 from .const import SUBDOMAINS_LIST
 from .exceptions import NotAuthenticatedError, UnknownError
 
@@ -28,9 +30,12 @@ def _raise_for_result(result: int, message: str | None = None) -> None:
     if result in RESULTS:
         if result != RESULT_SUCCESS:
             error_message = message or RESULTS[result]
-            raise UnknownError(
-                f"API request failed with result {result}: {error_message}"
-            )
+            if result == RESULT_INVALID_USERNAME_OR_PASSWORD:
+                raise NotAuthenticatedError(error_message)
+            else:
+                raise UnknownError(
+                    f"API request failed with result {result}: {error_message}"
+                )
 
 
 def _requests(method: str, url: str, **kwargs) -> dict:
@@ -97,15 +102,7 @@ class Auth:
             "passwd": self.password,
         }
 
-        response = requests.post(
-            url, json=payload, timeout=DEFAULT_TIMEOUT, verify=True
-        )
-        response.raise_for_status()
-        data = response.json()
-        if not ("result" in data and data["result"] == 0):
-            raise NotAuthenticatedError(
-                f"Authentication failed: {data.get('message', 'Unknown error')}"
-            )
+        data = _requests("POST", url, json=payload)
 
         key_to_attr = {
             "token": "_token",

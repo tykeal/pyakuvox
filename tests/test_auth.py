@@ -35,7 +35,7 @@ def test_init_invalid_subdomain():
     assert "Invalid subdomain" in str(excinfo.value)
 
 
-@patch("pyakuvox.auth.requests.post")
+@patch("pyakuvox.auth.requests.request")
 def test_authenticate_success(mock_post):
     """Test successful authentication."""
     subdomain = SUBDOMAINS_LIST[0]
@@ -46,7 +46,7 @@ def test_authenticate_success(mock_post):
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
-        "result": 0,
+        "result": RESULT_SUCCESS,
         "token": "fake-token",
         "grade": "user",
         "account": "user_account",
@@ -67,7 +67,7 @@ def test_authenticate_success(mock_post):
     mock_post.assert_called_once()
 
 
-@patch("pyakuvox.auth.requests.post")
+@patch("pyakuvox.auth.requests.request")
 def test_authenticate_failure(mock_post):
     """Test authentication failure."""
     subdomain = SUBDOMAINS_LIST[0]
@@ -79,12 +79,15 @@ def test_authenticate_failure(mock_post):
     # Akuvox API returns 200 response for all authentication
     # There is a "response" field in the JSON that indicates success or failure.
     mock_response.status_code = 200
-    mock_response.json.return_value = {"error": "Unauthorized"}
+    mock_response.json.return_value = {
+        "result": RESULT_INVALID_USERNAME_OR_PASSWORD,
+        "message": "Unauthorized",
+    }
     mock_post.return_value = mock_response
 
     with pytest.raises(NotAuthenticatedError) as excinfo:
         auth.authenticate()
-    assert "Authentication failed" in str(excinfo.value)
+    assert "Unauthorized" in str(excinfo.value)
     with pytest.raises(NotAuthenticatedError) as excinfo:
         auth.token
     assert "User is not authenticated" in str(excinfo.value)
@@ -113,9 +116,19 @@ def test__raise_for_result_failure():
     """Test _raise_for_result raises UnknownError for error result."""
     from pyakuvox.auth import _raise_for_result
 
-    with pytest.raises(UnknownError) as excinfo:
+    with pytest.raises(NotAuthenticatedError) as excinfo:
         _raise_for_result(RESULT_INVALID_USERNAME_OR_PASSWORD)
     assert "Invalid username or password" in str(excinfo.value)
+
+
+def test__raise_for_result_unknown():
+    """Test _raise_for_result raises UnknownError for error result."""
+    from pyakuvox.auth import _raise_for_result
+    from pyakuvox.const import RESULT_UNKNOWN
+
+    with pytest.raises(UnknownError) as excinfo:
+        _raise_for_result(RESULT_UNKNOWN)
+    assert "Unknown error" in str(excinfo.value)
 
 
 @patch("pyakuvox.auth.requests.request")
