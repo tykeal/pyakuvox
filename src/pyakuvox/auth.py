@@ -8,6 +8,7 @@ from typing import Final
 import requests
 
 from .const import BASE_DOMAIN
+from .const import DEFAULT_TIMEOUT
 from .const import RESULTS
 from .const import RESULT_INVALID_USERNAME_OR_PASSWORD
 from .const import RESULT_SUCCESS
@@ -52,6 +53,8 @@ def _requests(method: str, url: str, **kwargs) -> dict:
     :meta private:
     """
     try:
+        kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+        kwargs.setdefault("verify", True)  # Ensure SSL verification is enabled
         response = requests.request(method, url, **kwargs)
         response.raise_for_status()
 
