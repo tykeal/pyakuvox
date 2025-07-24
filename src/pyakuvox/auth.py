@@ -152,6 +152,7 @@ class Auth:
         """Get the user's role."""
         return self._role
 
+    @property
     def is_authenticated(self) -> bool:
         """Check if the user is authenticated.
 
@@ -167,3 +168,24 @@ class Auth:
     def __str__(self) -> str:
         """Return a user-friendly string representation of the Auth object."""
         return self.__repr__()
+
+    def requests(self, method: str, path: str, **kwargs) -> dict:
+        """Make a request to the Akuvox API using the authenticated session.
+
+        :param method: HTTP method to use (e.g., 'GET', 'POST').
+        :type method: str
+        :param path: The API endpoint to send the request to.
+        :type path: str
+        :param kwargs: Additional keyword arguments for the request.
+        :return: The response from the Akuvox API.
+        :rtype: dict
+        """
+        if not self.is_authenticated:
+            self.authenticate()
+
+        url = f"{self.base_url}/{path.lstrip('/')}"
+        if "headers" not in kwargs:
+            kwargs["headers"] = {}
+        kwargs["headers"]["x-auth-token"] = self.token
+
+        return _requests(method, url, **kwargs)

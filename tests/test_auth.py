@@ -22,7 +22,7 @@ def test_init_valid_subdomain():
     with pytest.raises(NotAuthenticatedError) as excinfo:
         auth.token
     assert "User is not authenticated" in str(excinfo.value)
-    assert auth.is_authenticated() is False
+    assert auth.is_authenticated is False
 
 
 def test_init_invalid_subdomain():
@@ -63,7 +63,7 @@ def test_authenticate_success(mock_post):
     assert auth.timezone == "UTC"
     assert auth.community_id == "community_123"
     assert auth.role == "user_role"
-    assert auth.is_authenticated() is True
+    assert auth.is_authenticated is True
     mock_post.assert_called_once()
 
 
@@ -91,7 +91,7 @@ def test_authenticate_failure(mock_post):
     with pytest.raises(NotAuthenticatedError) as excinfo:
         auth.token
     assert "User is not authenticated" in str(excinfo.value)
-    assert auth.is_authenticated() is False
+    assert auth.is_authenticated is False
 
 
 def test_repr_and_str():
@@ -167,3 +167,36 @@ def test__requests_failure(mock_request):
     with pytest.raises(UnknownError) as excinfo:
         _requests("POST", "http://test", json={})
     assert "Request failed" in str(excinfo.value)
+
+
+@patch("pyakuvox.auth._requests")
+@patch.object(Auth, "is_authenticated", return_value=True)
+def test_auth_requests_success(mock_is_authenticated, mock__requests):
+    """Test Auth.requests returns JSON on success and passes correct arguments."""
+    subdomain = SUBDOMAINS_LIST[0]
+    username = "user"
+    password = "pass"
+    auth = Auth(subdomain, username, password)
+    auth._token = "fake-token"
+    mock__requests.return_value = {"result": RESULT_SUCCESS, "message": "Success"}
+    result = auth.requests("POST", "/test", json={"foo": "bar"})
+    assert result["message"] == "Success"
+    mock__requests.assert_called_once()
+    args, kwargs = mock__requests.call_args
+    assert args[0] == "POST"
+    assert "/test" in args[1]
+    assert kwargs["headers"]["x-auth-token"] == "fake-token"
+
+
+@patch("pyakuvox.auth._requests")
+@patch.object(Auth, "authenticate")
+def test_auth_requests_triggers_authenticate(mock_authenticate, mock__requests):
+    """Test Auth.requests calls authenticate if not authenticated."""
+    subdomain = SUBDOMAINS_LIST[0]
+    username = "user"
+    password = "pass"
+    auth = Auth(subdomain, username, password)
+    mock__requests.return_value = {"result": RESULT_SUCCESS, "message": "Success"}
+    with pytest.raises(NotAuthenticatedError):
+        auth.requests("POST", "/test", json={"foo": "bar"})
+    mock_authenticate.assert_called_once()
