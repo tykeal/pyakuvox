@@ -46,8 +46,8 @@ def _requests(method: str, url: str, **kwargs) -> dict:
     :param url: The URL to send the request to.
     :type url: str
     :param kwargs: Additional keyword arguments for the request.
-    :return: The response from the Akuvox API.
-    :rtype: requests.Response
+    :return: The parsed JSON response from the Akuvox API.
+    :rtype: dict
 
     :meta private:
     """
