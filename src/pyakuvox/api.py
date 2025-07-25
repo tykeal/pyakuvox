@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from .auth import Auth
+from .communities import Communities
 
 
 class Akuvox:
@@ -17,3 +18,4 @@ class Akuvox:
         :type auth: Auth
         """
         self.auth = auth
+        self.communities = Communities(auth)
