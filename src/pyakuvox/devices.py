@@ -46,6 +46,8 @@ class Devices:
     def __init__(self, community_id: str, auth: Auth) -> None:
         """Initialize the Devices manager.
 
+        :param community_id: The ID of the community to manage devices for.
+        :type community_id: str
         :param auth: An instance of the Auth class for authentication.
         :type auth: Auth
         """
