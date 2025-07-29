@@ -3,6 +3,7 @@
 """Communities management for the Akuvox system."""
 
 from __future__ import annotations
+from typing import Any
 
 from .auth import Auth
 from .devices import Device, Devices
@@ -11,7 +12,7 @@ from .devices import Device, Devices
 class Community:
     """Represents a single community."""
 
-    def __init__(self, data, auth) -> None:
+    def __init__(self, data: dict[str, Any], auth: Auth) -> None:
         """Initialize the Community instance.
 
         :param data: The community data dictionary.
@@ -19,8 +20,8 @@ class Community:
         :param auth: An instance of the Auth class for authentication.
         :type auth: Auth
         """
-        self.ID = data.get("ID")
-        self.Location = data.get("Location")
+        self.ID = data.get("ID", "")
+        self.Location = data.get("Location", "")
         self._auth = auth
         self._devices = Devices(self.ID, self._auth)
 
