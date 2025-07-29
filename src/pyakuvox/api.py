@@ -1,10 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2023 Andrew Grimberg <tykeal@bardicgrove.org>
+# SPDX-FileCopyrightText: 2025 Andrew Grimberg <tykeal@bardicgrove.org>
 """API for interacting with Akuvox services."""
 
 from __future__ import annotations
 
 from .auth import Auth
+from .communities import Communities
 
 
 class Akuvox:
@@ -17,3 +18,4 @@ class Akuvox:
         :type auth: Auth
         """
         self.auth = auth
+        self.communities = Communities(auth)

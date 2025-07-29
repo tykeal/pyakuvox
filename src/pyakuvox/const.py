@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2023 Andrew Grimberg <tykeal@bardicgrove.org>
+# SPDX-FileCopyrightText: 2025 Andrew Grimberg <tykeal@bardicgrove.org>
 """Constants for the pyakuvox library."""
 
 from __future__ import annotations
