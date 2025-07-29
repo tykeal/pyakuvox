@@ -73,3 +73,30 @@ class Devices:
         if "row" in data:
             data = data["row"]
             self._devices = [Device(item) for item in data]
+
+    def get_devices_by_type(self, device_type: DEVICE_TYPE) -> list[Device]:
+        """Return devices filtered by type.
+
+        :param device_type: The device type to filter by.
+        :type device_type: DEVICE_TYPE
+        :return: A list of Device instances of the specified type.
+        :rtype: list[Device]
+        """
+        if not self._devices:
+            self.get_devices()
+        return [device for device in self._devices if device.Type == device_type]
+
+    @property
+    def door_phones(self) -> list[Device]:
+        """Return all door phone devices."""
+        return self.get_devices_by_type(DEVICE_TYPE.DOOR_PHONE)
+
+    @property
+    def indoor_monitors(self) -> list[Device]:
+        """Return all indoor monitor devices."""
+        return self.get_devices_by_type(DEVICE_TYPE.INDOOR_MONITOR)
+
+    @property
+    def stair_phones(self) -> list[Device]:
+        """Return all stair phone devices."""
+        return self.get_devices_by_type(DEVICE_TYPE.STAIR_PHONE)

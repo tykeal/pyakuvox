@@ -175,3 +175,82 @@ def test_devices_get_devices_handles_empty_row():
 
     # Access through property which will call get_devices() once
     assert len(devices.devices) == 0
+
+
+def test_devices_get_devices_by_type():
+    """Test that get_devices_by_type filters devices correctly."""
+    auth = DummyAuth()
+    devices = Devices("333", auth)
+
+    api_response = {
+        "data": {
+            "row": [
+                {"ID": 1, "Name": "Door1", "Type": "1"},  # DOOR_PHONE
+                {"ID": 2, "Name": "Monitor1", "Type": "2"},  # INDOOR_MONITOR
+                {"ID": 3, "Name": "Door2", "Type": "1"},  # DOOR_PHONE
+                {"ID": 4, "Name": "Stair1", "Type": "0"},  # STAIR_PHONE
+            ]
+        }
+    }
+    auth.requests.return_value = api_response
+
+    door_phones = devices.get_devices_by_type(DEVICE_TYPE.DOOR_PHONE)
+    assert len(door_phones) == 2
+    assert door_phones[0].Name == "Door1"
+    assert door_phones[1].Name == "Door2"
+
+    indoor_monitors = devices.get_devices_by_type(DEVICE_TYPE.INDOOR_MONITOR)
+    assert len(indoor_monitors) == 1
+    assert indoor_monitors[0].Name == "Monitor1"
+
+    stair_phones = devices.get_devices_by_type(DEVICE_TYPE.STAIR_PHONE)
+    assert len(stair_phones) == 1
+    assert stair_phones[0].Name == "Stair1"
+
+
+def test_devices_type_properties():
+    """Test that device type properties return filtered devices."""
+    auth = DummyAuth()
+    devices = Devices("444", auth)
+
+    api_response = {
+        "data": {
+            "row": [
+                {"ID": 1, "Name": "Door1", "Type": "1"},
+                {"ID": 2, "Name": "Monitor1", "Type": "2"},
+                {"ID": 3, "Name": "Stair1", "Type": "0"},
+                {"ID": 5, "Name": "Door2", "Type": "1"},
+            ]
+        }
+    }
+    auth.requests.return_value = api_response
+
+    # Test door_phones property
+    door_phones = devices.door_phones
+    assert len(door_phones) == 2
+    assert all(d.Type == DEVICE_TYPE.DOOR_PHONE for d in door_phones)
+
+    # Test indoor_monitors property
+    indoor_monitors = devices.indoor_monitors
+    assert len(indoor_monitors) == 1
+    assert all(d.Type == DEVICE_TYPE.INDOOR_MONITOR for d in indoor_monitors)
+
+    # Test stair_phones property
+    stair_phones = devices.stair_phones
+    assert len(stair_phones) == 1
+    assert all(d.Type == DEVICE_TYPE.STAIR_PHONE for d in stair_phones)
+
+    # Verify API was only called once (due to lazy loading)
+    auth.requests.assert_called_once()
+
+
+def test_devices_type_properties_with_no_devices():
+    """Test that device type properties return empty lists when no devices exist."""
+    auth = DummyAuth()
+    devices = Devices("555", auth)
+
+    auth.requests.return_value = {"data": {"row": []}}
+
+    assert devices.door_phones == []
+    assert devices.indoor_monitors == []
+    assert devices.stair_phones == []
