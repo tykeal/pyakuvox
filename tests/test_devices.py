@@ -3,7 +3,7 @@
 """Tests for the Akuvox Devices module."""
 
 from unittest.mock import MagicMock
-from pyakuvox.devices import Device, Devices, DEVICE_TYPE
+from pyakuvox.devices import Device, Devices, DEVICE_TYPE, DEVICE_STATUS
 
 
 class DummyAuth:
@@ -22,7 +22,7 @@ def test_device_init_sets_all_properties():
         "Location": "Building A",
         "MAC": "00:11:22:33:44:55",
         "Type": "1",
-        "Status": 1,
+        "Status": "1",
         "UnitName": "Unit 101",
         "RoomName": "Living Room",
         "Name": "Front Door",
@@ -36,7 +36,7 @@ def test_device_init_sets_all_properties():
     assert device.Location == "Building A"
     assert device.MAC == "00:11:22:33:44:55"
     assert device.Type == DEVICE_TYPE.DOOR_PHONE
-    assert device.Status == 1
+    assert device.Status == DEVICE_STATUS.ONLINE
     assert device.UnitName == "Unit 101"
     assert device.RoomName == "Living Room"
     assert device.Name == "Front Door"
@@ -54,7 +54,7 @@ def test_device_init_with_missing_data():
     assert device.Location == ""
     assert device.MAC == ""
     assert device.Type == DEVICE_TYPE.STAIR_PHONE  # Default type
-    assert device.Status == 0
+    assert device.Status == DEVICE_STATUS.OFFLINE  # Default status
     assert device.UnitName == ""
     assert device.RoomName == ""
     assert device.Name == ""
@@ -91,14 +91,14 @@ def test_devices_get_devices_populates_device_list():
                     "Name": "Front Door",
                     "MAC": "00:11:22:33:44:55",
                     "Type": "1",
-                    "Status": 1,
+                    "Status": "1",
                 },
                 {
                     "ID": 2,
                     "Name": "Back Door",
                     "MAC": "00:11:22:33:44:66",
                     "Type": "1",
-                    "Status": 0,
+                    "Status": "0",
                 },
             ]
         }

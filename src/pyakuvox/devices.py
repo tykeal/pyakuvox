@@ -9,14 +9,19 @@ from enum import StrEnum
 from .auth import Auth
 
 
+class DEVICE_STATUS(StrEnum):
+    """Device status enumeration."""
+
+    OFFLINE = "0"
+    ONLINE = "1"
+
+
 class DEVICE_TYPE(StrEnum):
     """Device type enumeration."""
 
-    # Add device types as needed
     STAIR_PHONE = "0"
     DOOR_PHONE = "1"
     INDOOR_MONITOR = "2"
-    # Add more types as discovered
 
 
 class Device:
@@ -33,7 +38,7 @@ class Device:
         self.Location: str = data.get("Location", "")
         self.MAC: str = data.get("MAC", "")
         self.Type: DEVICE_TYPE = DEVICE_TYPE(data.get("Type", "0"))
-        self.Status: int = data.get("Status", 0)
+        self.Status: DEVICE_STATUS = DEVICE_STATUS(data.get("Status", "0"))
         self.UnitName: str = data.get("UnitName", "")
         self.RoomName: str = data.get("RoomName", "")
         self.Name: str = data.get("Name", "")
