@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 Andrew Grimberg <tykeal@bardicgrove.org>
+# SPDX-FileCopyrightText: 2025 Andrew Grimberg <tykeal@bardicgrove.org>
 """Devices management for the Akuvox system."""
 
 from __future__ import annotations
