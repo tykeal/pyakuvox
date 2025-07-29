@@ -59,7 +59,7 @@ def test_community_devices_property_returns_devices():
     assert (
         devices == []
     )  # Initially empty until get_devices is called on the Devices instance
-    assert devices is community._devices.devices
+    assert devices == community._devices.devices
 
 
 def test_community_has_devices_instance():

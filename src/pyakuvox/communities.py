@@ -50,7 +50,7 @@ class Communities:
         """Retrieve a list of communities.
 
         :return: A list of communities.
-        :rtype: list[dict]
+        :rtype: list[Community]
         """
         path = "/property/comunityinfo"
         response = self._auth.requests("GET", path)

@@ -75,6 +75,8 @@ class Devices:
         if "row" in data:
             data = data["row"]
             self._devices = [Device(item) for item in data]
+        else:
+            self._devices = []
 
     def get_devices_by_type(self, device_type: DEVICE_TYPE) -> list[Device]:
         """Return devices filtered by type.
