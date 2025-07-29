@@ -43,19 +43,21 @@ class Device:
 class Devices:
     """Devices management for the Akuvox system."""
 
-    def __init__(self, community_id: int, auth: Auth) -> None:
+    def __init__(self, community_id: str, auth: Auth) -> None:
         """Initialize the Devices manager.
 
         :param auth: An instance of the Auth class for authentication.
         :type auth: Auth
         """
         self._auth = auth
-        self._community_id: int = community_id
+        self._community_id: str = community_id
         self._devices: list[Device] = []
 
     @property
     def devices(self) -> list[Device]:
         """Return the list of devices."""
+        if not self._devices:
+            self.get_devices()
         return self._devices
 
     def get_devices(self) -> None:

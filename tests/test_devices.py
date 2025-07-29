@@ -127,8 +127,7 @@ def test_devices_get_devices_handles_missing_data_key():
 
     auth.requests.return_value = {}
 
-    devices.get_devices()
-
+    # Access through property which will call get_devices() once
     assert len(devices.devices) == 0
     auth.requests.assert_called_once_with(
         "GET", "/property/selectdevice", headers={"x-community-id": "456"}
@@ -142,8 +141,7 @@ def test_devices_get_devices_handles_missing_row_key():
 
     auth.requests.return_value = {"data": {}}
 
-    devices.get_devices()
-
+    # Access through property which will call get_devices() once
     assert len(devices.devices) == 0
 
 
@@ -155,7 +153,7 @@ def test_devices_get_devices_clears_existing_devices():
     # First call
     auth.requests.return_value = {"data": {"row": [{"ID": 1, "Name": "Device1"}]}}
     devices.get_devices()
-    assert len(devices.devices) == 1
+    assert len(devices._devices) == 1
 
     # Second call with different data
     auth.requests.return_value = {
@@ -163,9 +161,9 @@ def test_devices_get_devices_clears_existing_devices():
     }
     devices.get_devices()
 
-    assert len(devices.devices) == 2
-    assert devices.devices[0].ID == "2"
-    assert devices.devices[1].ID == "3"
+    assert len(devices._devices) == 2
+    assert devices._devices[0].ID == "2"
+    assert devices._devices[1].ID == "3"
 
 
 def test_devices_get_devices_handles_empty_row():
@@ -175,6 +173,5 @@ def test_devices_get_devices_handles_empty_row():
 
     auth.requests.return_value = {"data": {"row": []}}
 
-    devices.get_devices()
-
+    # Access through property which will call get_devices() once
     assert len(devices.devices) == 0

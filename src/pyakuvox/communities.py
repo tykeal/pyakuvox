@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from .auth import Auth
+from .devices import Device, Devices
 
 
 class Community:
@@ -21,13 +22,16 @@ class Community:
         self.ID = data.get("ID")
         self.Location = data.get("Location")
         self._auth = auth
+        self._devices = Devices(self.ID, self._auth)
 
-    def get_devices(self) -> dict:
-        """Return the list of devices in this community."""
-        path = "/property/selectdevice"
-        headers = {"x-community-id": str(self.ID)}
-        response = self._auth.requests("GET", path, headers=headers)
-        return response.get("data", {})
+    @property
+    def devices(self) -> list[Device]:
+        """Return the list of devices in this community.
+
+        :return: A list of Device instances.
+        :rtype: list[Device]
+        """
+        return self._devices.devices
 
 
 class Communities:

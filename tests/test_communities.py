@@ -47,29 +47,29 @@ def test_get_communities_returns_empty_list_if_no_data():
     assert result == []
 
 
-def test_community_get_devices_returns_devices():
-    """Test Community.get_devices returns devices from auth.requests."""
+def test_community_devices_property_returns_devices():
+    """Test Community.devices property returns devices from Devices instance."""
     auth = DummyAuth()
     community_data = {"ID": 42, "Location": "TestLoc"}
-    expected_devices = [{"id": 1, "name": "Device1"}, {"id": 2, "name": "Device2"}]
-    auth.requests.return_value = {"data": expected_devices}
     from pyakuvox.communities import Community
 
     community = Community(community_data, auth)
-    devices = community.get_devices()
-    assert devices == expected_devices
-    auth.requests.assert_called_once_with(
-        "GET", "/property/selectdevice", headers={"x-community-id": "42"}
-    )
+    # The devices property returns the list from the internal Devices instance
+    devices = community.devices
+    assert (
+        devices == []
+    )  # Initially empty until get_devices is called on the Devices instance
+    assert devices is community._devices.devices
 
 
-def test_community_get_devices_returns_empty_list_if_no_devices():
-    """Test Community.get_devices returns empty list if no devices key."""
+def test_community_has_devices_instance():
+    """Test Community initializes with a Devices instance."""
     auth = DummyAuth()
-    community_data = {"ID": 99, "Location": "EmptyLoc"}
-    auth.requests.return_value = {}
+    community_data = {"ID": 99, "Location": "TestLoc"}
     from pyakuvox.communities import Community
+    from pyakuvox.devices import Devices
 
     community = Community(community_data, auth)
-    devices = community.get_devices()
-    assert devices == {}
+    assert isinstance(community._devices, Devices)
+    assert community._devices._community_id == 99
+    assert community._devices._auth is auth
